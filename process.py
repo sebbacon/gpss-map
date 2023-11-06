@@ -130,6 +130,7 @@ coolwarm_cmap = plt.cm.get_cmap('coolwarm')
 pcn_color_data['gradient_color'] = pcn_color_data['emis_proportion'].apply(coolwarm_cmap)
 
 gdf_colored = gdf.merge(pcn_color_data, left_on='code', right_on='pcn_code')
+gdf_colored.to_crs(epsg=27700)
 
 # Plot and save map
 fig, ax = plt.subplots(1, 1, figsize=(15, 15))
