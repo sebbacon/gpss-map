@@ -1,0 +1,50 @@
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  check-html:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+      with:
+        token: ${{secrets.GITHUB_TOKEN}}
+
+    - name: Set up Python environment
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.11
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Grab data
+      run: python grab.py
+
+    - name: Process data and make map
+      run: python process.py
+
+    - name: Check for Changes
+      id: git-check
+      run: |
+        git diff output/ --exit-code || echo "git-diff-exit-code=$?" >> $GITHUB_ENV
+      continue-on-error: true
+
+    - name: Configure Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+
+    - name: Commit and Push Output
+      if: env.git-diff-exit-code == '1'
+      run: |
+        git add output/
+        git commit -m "Add output from GitHub Action"
+        git push 
+
+
+
+
