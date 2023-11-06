@@ -10,8 +10,8 @@ import zipfile
 # Define file paths
 zip_file_path = 'data.zip'
 extracted_folder_path = 'extracted/'
-output_csv_path = 'pcn_system_supplier_counts_with_icb.csv'
-output_map_path = 'pcn_map.png'
+output_csv_path = 'output/pcn_system_supplier_counts_with_icb.csv'
+output_map_path = 'output/pcn_map.png'
 
 # Unzip the provided files, including nested zip files
 with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
