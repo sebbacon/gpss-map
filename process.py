@@ -122,6 +122,8 @@ updated_pcn_counts_with_icb.to_csv(output_csv_path, index=False)
 
 # Create GeoDataFrame for the map
 gdf = gpd.GeoDataFrame.from_features(pcn_geo_data['features'])
+gdf.crs = "EPSG:4326"
+gdf = gdf.to_crs("EPSG:27700")
 
 # Merge with color data for the map
 pcn_color_data = updated_pcn_counts_with_icb[['pcn_code', 'EMIS', 'TPP']].copy()
@@ -130,7 +132,7 @@ coolwarm_cmap = plt.cm.get_cmap('coolwarm')
 pcn_color_data['gradient_color'] = pcn_color_data['emis_proportion'].apply(coolwarm_cmap)
 
 gdf_colored = gdf.merge(pcn_color_data, left_on='code', right_on='pcn_code')
-gdf_colored.to_crs(epsg=27700)
+
 
 # Plot and save map
 fig, ax = plt.subplots(1, 1, figsize=(15, 15))
