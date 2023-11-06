@@ -1,0 +1,6 @@
+bs4
+requests
+matplotlib
+pandas
+geopandas
+openpyxl
