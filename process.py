@@ -1,3 +1,4 @@
+import glob
 import os
 import pandas as pd
 import geopandas as gpd
@@ -30,7 +31,7 @@ for root, dirs, files in os.walk(extracted_folder_path):
 
 # Define paths to the extracted files
 excel_file_path = os.path.join(extracted_folder_path, 'ePCN.xlsx')
-csv_file_path = os.path.join(extracted_folder_path, 'POMI_APR2023_to_SEP2023.csv')
+csv_file_path = glob.glob(extracted_folder_path + "POMI*.csv")[0]
 json_file_path = os.path.join(extracted_folder_path, 'pcn_map.json')
 
 # Define dummy data functions for fallback
