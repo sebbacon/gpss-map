@@ -96,7 +96,14 @@ pcn_core_partner_details_renamed = pcn_core_partner_details.rename(
 )
 
 # Process the CSV data
-csv_data_relevant = csv_data[['practice_code', 'system_supplier']]
+# Define a custom function to get the last value when ordered by 'Order_Column'
+def last_value_ordered(group):
+    #sorted_group = group.sort_values(by='Order_Column')
+    last_row = group.iloc[-1]
+    return last_row
+
+csv_data_relevant = csv_data.groupby('practice_code').apply(last_value_ordered)
+csv_data_relevant = csv_data_relevant[['practice_code', 'system_supplier']].reset_index(drop=True)
 
 # Merge and count system suppliers per PCN
 
