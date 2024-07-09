@@ -86,12 +86,19 @@ if os.path.isfile(json_file_path):
 else:
     pcn_geo_data = generate_dummy_json()
 
+# Some PCN-practice relationships have ended. This is indicated by the 'Practice to PCN\nRelationship\nEnd Date' column being
+# non-null. We want to ignore these practices when counting the number of TPP and EMIS practices.
+pcn_core_partner_details = pcn_core_partner_details[pcn_core_partner_details['Practice to PCN\nRelationship\nEnd Date'].isna()]
+
+# assert that the resulting dataframe has no duplicates across 'Partner\nOrganisation\nCode'
+assert not pcn_core_partner_details.duplicated(subset=['Partner\nOrganisation\nCode']).any(), "Duplicate entries in 'Partner Organisation Code'"
+
 # Process the Excel data
 pcn_core_partner_details_renamed = pcn_core_partner_details.rename(
     columns={
         'Partner\nOrganisation\nCode': 'practice_code',
         'PCN Code': 'pcn_code',
-        'Practice\nParent\nSub ICB Loc Code': 'ICB'
+        'Practice\nParent\nSub ICB Loc Code': 'sub_ICB'
     }
 )
 
@@ -117,7 +124,7 @@ pcn_system_supplier_counts = merged_data.groupby(['pcn_code', 'system_supplier']
 pcn_system_supplier_counts.reset_index(inplace=True)
 
 # Add ICB values to the CSV
-unique_icb_data = pcn_core_partner_details_renamed[['pcn_code', 'ICB']].drop_duplicates(subset=['pcn_code'])
+unique_icb_data = pcn_core_partner_details_renamed[['pcn_code', 'sub_ICB']].drop_duplicates(subset=['pcn_code'])
 updated_pcn_counts_with_icb = pd.merge(
     pcn_system_supplier_counts,
     unique_icb_data,
@@ -127,6 +134,8 @@ updated_pcn_counts_with_icb = pd.merge(
 
 # Save to CSV
 updated_pcn_counts_with_icb.to_csv(output_csv_path, index=False)
+tpp_total = updated_pcn_counts_with_icb['TPP'].sum()
+emis_total = updated_pcn_counts_with_icb['EMIS'].sum()
 
 # Create GeoDataFrame for the map
 gdf = gpd.GeoDataFrame.from_features(pcn_geo_data['features'])
@@ -150,6 +159,8 @@ sm = plt.cm.ScalarMappable(cmap=coolwarm_cmap, norm=plt.Normalize(vmin=0, vmax=1
 sm._A = []
 cbar = fig.colorbar(sm, ax=ax)
 cbar.set_label('Proportion of EMIS (blue) to TPP (red)')
+plt.text(0.01, 0.95, f'Total TPP Practices: {tpp_total}', transform=ax.transAxes, fontsize=16)
+plt.text(0.01, 0.90, f'Total EMIS Practices: {emis_total}', transform=ax.transAxes, fontsize=16)
 plt.savefig(output_map_path)
 #breakpoint()
 # Return paths of generated files
