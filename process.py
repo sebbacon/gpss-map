@@ -86,6 +86,13 @@ if os.path.isfile(json_file_path):
 else:
     pcn_geo_data = generate_dummy_json()
 
+# Some PCN-practice relationships have ended. This is indicated by the 'Practice to PCN\nRelationship\nEnd Date' column being
+# non-null. We want to ignore these practices when counting the number of TPP and EMIS practices.
+pcn_core_partner_details = pcn_core_partner_details[pcn_core_partner_details['Practice to PCN\nRelationship\nEnd Date'].isna()]
+
+# assert that the resulting dataframe has no duplicates across 'Partner\nOrganisation\nCode'
+assert not pcn_core_partner_details.duplicated(subset=['Partner\nOrganisation\nCode']).any(), "Duplicate entries in 'Partner Organisation Code'"
+
 # Process the Excel data
 pcn_core_partner_details_renamed = pcn_core_partner_details.rename(
     columns={
