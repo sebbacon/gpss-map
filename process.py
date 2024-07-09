@@ -127,6 +127,8 @@ updated_pcn_counts_with_icb = pd.merge(
 
 # Save to CSV
 updated_pcn_counts_with_icb.to_csv(output_csv_path, index=False)
+tpp_total = updated_pcn_counts_with_icb['TPP'].sum()
+emis_total = updated_pcn_counts_with_icb['EMIS'].sum()
 
 # Create GeoDataFrame for the map
 gdf = gpd.GeoDataFrame.from_features(pcn_geo_data['features'])
@@ -150,6 +152,8 @@ sm = plt.cm.ScalarMappable(cmap=coolwarm_cmap, norm=plt.Normalize(vmin=0, vmax=1
 sm._A = []
 cbar = fig.colorbar(sm, ax=ax)
 cbar.set_label('Proportion of EMIS (blue) to TPP (red)')
+plt.text(0.01, 0.95, f'Total TPP Practices: {tpp_total}', transform=ax.transAxes, fontsize=16)
+plt.text(0.01, 0.90, f'Total EMIS Practices: {emis_total}', transform=ax.transAxes, fontsize=16)
 plt.savefig(output_map_path)
 #breakpoint()
 # Return paths of generated files
