@@ -98,7 +98,7 @@ pcn_core_partner_details_renamed = pcn_core_partner_details.rename(
     columns={
         'Partner\nOrganisation\nCode': 'practice_code',
         'PCN Code': 'pcn_code',
-        'Practice\nParent\nSub ICB Loc Code': 'ICB'
+        'Practice\nParent\nSub ICB Loc Code': 'sub_ICB'
     }
 )
 
@@ -124,7 +124,7 @@ pcn_system_supplier_counts = merged_data.groupby(['pcn_code', 'system_supplier']
 pcn_system_supplier_counts.reset_index(inplace=True)
 
 # Add ICB values to the CSV
-unique_icb_data = pcn_core_partner_details_renamed[['pcn_code', 'ICB']].drop_duplicates(subset=['pcn_code'])
+unique_icb_data = pcn_core_partner_details_renamed[['pcn_code', 'sub_ICB']].drop_duplicates(subset=['pcn_code'])
 updated_pcn_counts_with_icb = pd.merge(
     pcn_system_supplier_counts,
     unique_icb_data,
