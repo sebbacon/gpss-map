@@ -33,7 +33,10 @@ for root, dirs, files in os.walk(extracted_folder_path):
 
 # Define paths to the extracted files
 excel_file_path = os.path.join(extracted_folder_path, "ePCN.xlsx")
-csv_file_path = glob.glob(extracted_folder_path + "POMI*.csv")[0]
+
+csv_file_path = glob.glob(extracted_folder_path + "gp-reg-pat-prac-map*.csv")
+csv_file_path = csv_file_path[0] if csv_file_path else None
+
 json_file_path = os.path.join(extracted_folder_path, "pcn_map.json")
 
 
@@ -88,9 +91,13 @@ if os.path.isfile(excel_file_path):
 else:
     pcn_core_partner_details = generate_dummy_excel()
 
-if os.path.isfile(csv_file_path):
+if csv_file_path and os.path.isfile(csv_file_path):
     csv_data = pd.read_csv(csv_file_path)
+    csv_data = csv_data.rename(
+        columns={"PRACTICE_CODE": "practice_code", "SUPPLIER_NAME": "system_supplier"}
+    )
 else:
+    print(f"CSV file not found in {extracted_folder_path}. Using dummy data.")
     csv_data = generate_dummy_csv()
 
 if os.path.isfile(json_file_path):

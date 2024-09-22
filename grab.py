@@ -23,30 +23,44 @@ def zip_files(filenames, zip_name):
     print(f"Created zip file {zip_name}")
 
 
-# Step 1: Fetch the HTML content from NHS URL
-nhs_url = "https://digital.nhs.uk/data-and-information/publications/statistical/mi-patient-online-pomi/current"
+# Step 1: Fetch the HTML content from NHS URL and find the latest publication link
+nhs_url = "https://digital.nhs.uk/data-and-information/publications/statistical/patients-registered-at-a-gp-practice"
+
 response = requests.get(nhs_url)
 response.raise_for_status()
-
-# Step 2: Parse the HTML for the first ZIP file with the specified class
 soup = BeautifulSoup(response.text, "html.parser")
-zip_link = csv_link = None
+latest_pub_link = next(
+    (
+        urljoin(nhs_url, link.get("href"))
+        for link in soup.find_all("a")
+        if "patients-registered-at-a-gp-practice" in link.get("href", "")
+    ),
+    None,
+)
 
-for link in soup.find_all("a", class_="nhsd-a-box-link"):
-    href = link.get("href", "")
-    if href.endswith(".zip"):
-        zip_link = href
-        break
-    elif href.endswith(".csv"):
-        csv_link = href
-        break
 
-if not zip_link and not csv_link:
-    raise ValueError("No zip or csv file found with the specified class.")
+if not latest_pub_link:
+    raise ValueError("Could not find link to latest publication")
+
+# Step 2: Fetch the HTML content of the latest publication page and find the ZIP file link
+response = requests.get(latest_pub_link)
+response.raise_for_status()
+soup = BeautifulSoup(response.text, "html.parser")
+zip_link = next(
+    (
+        link.get("href")
+        for link in soup.find_all("a", class_="nhsd-a-box-link")
+        if "Mapping" in link.text
+    ),
+    None,
+)
+if not zip_link:
+    raise ValueError("No ZIP file with 'Mapping' found on the page")
 
 # Step 3: Download the NHS ZIP file
-link = zip_link or csv_link
-nhs_url = urljoin(nhs_url, link)
+
+nhs_url = urljoin(latest_pub_link, zip_link)
+
 nhs_filename = nhs_url.split("/")[-1]
 download_file(nhs_url, nhs_filename)
 
@@ -64,7 +78,6 @@ pcn_map_filename = "pcn_map.json"
 # Save the JSON data
 with open(pcn_map_filename, "w") as file:
     file.write(pcn_map_response.text)
-print("Downloaded pcn_map.json")
 
 # Step 6: Zip all the downloaded files into data.zip
 files_to_zip = [nhs_filename, epcn_filename, pcn_map_filename]
