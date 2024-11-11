@@ -7,6 +7,9 @@ jobs:
   check-html:
     runs-on: ubuntu-latest
 
+    env:
+      CF_WORKER_DOMAIN: ${{ secrets.CF_WORKER_DOMAIN }}
+
     steps:
     - name: Check out code
       uses: actions/checkout@v2
