@@ -81,8 +81,8 @@ def get_practice_data_url_cloudflare():
     return f"https://{os.environ.get('CF_WORKER_DOMAIN')}/", None
 
 
-# XXX you can try using  get_practice_data_url_local, but that stopped working (403) in github workflows
-url, path = get_practice_data_url_cloudflare()
+# this stopped working (403) in github workflows. Appears to work for a local runner though
+url, path = get_practice_data_url_local()
 nhs_filename = download_file(url, path)
 
 # Step 4: Download the ePCN ZIP file
