@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      CF_WORKER_DOMAIN: ${{ secrets.CF_WORKER_DOMAIN }}
+      CF_WORKER_DOMAIN: ${{ vars.CF_WORKER_DOMAIN }}
 
     steps:
     - name: Check out code
