@@ -4,11 +4,9 @@ on:
     - cron: "0 0 * * 0"  # weekly
 
 jobs:
+  
   check-html:
-    runs-on: self-hosted
-
-    env:
-      CF_WORKER_DOMAIN: ${{ vars.CF_WORKER_DOMAIN }}
+    runs-on: ubuntu-latest
 
     steps:
     - name: Check out code
