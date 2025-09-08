@@ -191,7 +191,7 @@ ax.axis("off")
 sm = plt.cm.ScalarMappable(cmap=coolwarm_cmap, norm=plt.Normalize(vmin=0, vmax=1))
 sm._A = []
 cbar = fig.colorbar(sm, ax=ax)
-cbar.set_label("Proportion of EMIS (blue) to TPP (red)")
+cbar.set_label("Proportion of EMIS (red) to TPP (blue)")
 plt.text(
     0.01, 0.95, f"Total TPP Practices: {tpp_total}", transform=ax.transAxes, fontsize=16
 )
